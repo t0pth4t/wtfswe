@@ -5,16 +5,50 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 
-
-Future<Restaurant> fetchRestaurant() async {
-  final response = await http.get('https://jsonplaceholder.typicode.com/posts/1');
+//
+Future<Restaurant> fetchRestaurant(lat, long) async {
+  
+  final response = await http.get("https://developers.zomato.com/api/v2.1/cities?lat=$lat&lon=$long", headers: {'user-key': ''});
 
   if(response.statusCode == 200){
+    final cities = parseCities(response.body);
     return Restaurant.fromJson(json.decode(response.body));
   } 
 
     throw Exception('Failed to load');
   
+}
+
+List<City> parseCities(String responseBody){
+  final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
+  return parsed.map<City>((json) => City.fromJson(json)).toList();
+}
+
+class City {
+  final String id;
+  final String name;
+  final String countryId;
+  final String countryName;
+  final String isState;
+  final String stateId;
+  final String stateName;
+  final String stateCode;
+
+  City({this.id, this.name, this.countryId, this.countryName, this.isState, this.stateId, this.stateName, this.stateCode});
+
+  
+  factory City.fromJson(Map<String, dynamic> json){
+    return City(
+      id: json['id'],
+      name: json['name'],
+      countryId: json['country_id'],
+      countryName: json['country_name'],
+      isState: json['is_state'],
+      stateId: json['state_id'],
+      stateName: json['state_name'],
+      stateCode: json['state_code']
+      );
+  }
 }
 
 class Restaurant{
@@ -70,7 +104,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  
    Map<String, double> _startLocation;
   Map<String, double> _currentLocation;
 
@@ -115,17 +149,6 @@ class _MyHomePageState extends State<MyHomePage> {
         _startLocation = location;
     });
 
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
   }
 
   @override
@@ -177,11 +200,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: new Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // floatingActionButton: new FloatingActionButton(
+      //   onPressed: _incrementCounter,
+      //   tooltip: 'Increment',
+      //   child: new Icon(Icons.add),
+      // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
