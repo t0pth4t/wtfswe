@@ -1,8 +1,3 @@
 # wtfswe
 
-A new Flutter project.
-
-## Getting Started
-
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
+Have you ever asked yourself, where the f$%& should I eat? Just load up this app and solve all your problems...
